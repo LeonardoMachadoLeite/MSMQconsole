@@ -1,0 +1,7 @@
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\bin\Debug\MSMQconsole.exe.config
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\bin\Debug\MSMQconsole.exe
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\bin\Debug\MSMQconsole.pdb
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.csprojAssemblyReference.cache
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.csproj.CoreCompileInputs.cache
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.exe
+C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.pdb
