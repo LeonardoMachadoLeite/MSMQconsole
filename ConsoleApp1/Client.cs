@@ -47,7 +47,7 @@ namespace Client
             Console.WriteLine("Digite o seu nome de usuário:");
             string username = Console.ReadLine();
 
-            string input = "";
+            string input = String.Format(" entrou no chat");
 
             Action<object> receiveMsgsAction = (object obj) =>
             {
@@ -63,7 +63,7 @@ namespace Client
 
             Task receiveMsgs = Task.Factory.StartNew(receiveMsgsAction,"receiver");
 
-            Console.WriteLine("Você entrou na conversa");
+            Console.WriteLine("Você entrou no chat");
             while (!input.Equals("sair"))
             {
 

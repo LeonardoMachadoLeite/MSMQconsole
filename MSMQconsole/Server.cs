@@ -17,7 +17,7 @@ namespace MSMQconsole
         static void Main(string[] args)
         {
 
-            string username = "Servidor";
+            //string username = "Servidor";
 
             if (MessageQueue.Exists(@".\Private$\MSMQ_queue"))
             {
@@ -72,7 +72,6 @@ namespace MSMQconsole
 
             Task receiveMsgs = Task.Factory.StartNew(receiveMsgsAction, "receiver");
 
-            
             while (!input.Equals("parar"))
             {
                 input = Console.ReadLine();
@@ -89,7 +88,7 @@ namespace MSMQconsole
             msg.Body = MessageToBeSent;
             msg.Label = username;
 
-            if (MessageToBeSent.StartsWith("HP:"))
+            if (MessageToBeSent.StartsWith("(HP)"))
             {
                 msg.Priority = MessagePriority.Highest;
             }
