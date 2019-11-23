@@ -11,32 +11,46 @@ namespace Client
     class Client
     {
 
+        static MessageQueue MyQueue;
+
         static void Main(string[] args)
         {
 
-            string username = "Client";
-            //Thread.Sleep(2000);
-            string server_ip = "192.168.15.1";
+            Console.WriteLine("Digite o ip do servidor:");
+            string server_ip = Console.ReadLine();
             Console.WriteLine("Trying to connect to " + server_ip);
-            MessageQueue appQueue = new MessageQueue(@"FormatName:DIRECT=TCP:192.168.15.1\Private$\MSMQ_queue"); // 192.168.7.1  192.168.0.10
+
+            MessageQueue appQueue = new MessageQueue(String.Format(@"FormatName:DIRECT=TCP:{0}\Private$\MSMQ_queue", server_ip)); // 192.168.7.1  192.168.0.10
+
+            if (MessageQueue.Exists(@".\Private$\MSMQ_queue"))
+            {
+                MyQueue = new MessageQueue(@".\Private$\MSMQ_queue");
+            }
+            else
+            {
+                MyQueue = MessageQueue.Create(@".\Private$\MSMQ_queue");
+            }
+
+            Console.WriteLine("Digite o seu nome de usuário:");
+            string username = Console.ReadLine();
+
             string input = "";
 
             Action<object> receiveMsgsAction = (object obj) =>
             {
+                while (input != "sair")
+                {
 
-                Console.WriteLine("Thread start");
+                    Message msg = MyQueue.Receive();
+                    msg.Formatter = new BinaryMessageFormatter();
+                    Console.WriteLine(msg.Body.ToString());
 
-                Message msg = appQueue.Peek();
-                msg.Formatter = new BinaryMessageFormatter();
-                Console.WriteLine(msg.Body.ToString());
-
-
+                }
             };
 
             Task receiveMsgs = Task.Factory.StartNew(receiveMsgsAction,"receiver");
 
             Console.WriteLine("Você entrou na conversa");
-            input = Console.ReadLine();
             while (!input.Equals("sair"))
             {
 

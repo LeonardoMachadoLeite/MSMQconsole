@@ -10,109 +10,68 @@ namespace MSMQconsole
     class Server
     {
 
+        private static Dictionary<string,Client_Queue> Client_Queues;
+        private static MessageQueue ServerQueue;
+        private static ICollection<Message> AllMsgs;
+
         static void Main(string[] args)
         {
 
             string username = "Servidor";
-            MessageQueue appQueue;
 
             if (MessageQueue.Exists(@".\Private$\MSMQ_queue"))
             {
-                appQueue = new MessageQueue(@".\Private$\MSMQ_queue");
+                ServerQueue = new MessageQueue(@".\Private$\MSMQ_queue");
             }
             else
             {
-                appQueue = MessageQueue.Create(@".\Private$\MSMQ_queue");
+                ServerQueue = MessageQueue.Create(@".\Private$\MSMQ_queue");
             }
 
+            Client_Queues = new Dictionary<string, Client_Queue>();
+            AllMsgs = new LinkedList<Message>();
+            ServerQueue.Purge();
 
-            //appQueue.
-            appQueue.Purge();
             Console.WriteLine("Chat inicializado");
             string input = "";
-
-            /*Action<object> receiveMsgsAction = (object obj) =>
-            {
-                while (input != "parar")
-                {
-                    Console.Clear();
-                    Console.WriteLine(Receive(appQueue));
-                }
-            };*/
 
             Action<object> receiveMsgsAction = (object obj) =>
             {
 
-                int msgs_amount = 0;
-
-                while (input != "sair")
+                while (input != "parar")
                 {
-                    Message[] msgs = appQueue.GetAllMessages();
 
-                    if (msgs_amount != msgs.Length)
+                    Message msg = ServerQueue.Receive();
+                    msg.Formatter = new BinaryMessageFormatter();
+                    if (msg.Body.ToString().StartsWith("Add:"))
                     {
-                        msgs_amount = msgs.Length;
-                        StringBuilder builder = new StringBuilder();
-                        bool first = true;
-
-                        foreach (Message msg in msgs)
+                        string new_ip = msg.Body.ToString().Substring(4);
+                        Client_Queues[new_ip] = new Client_Queue(new_ip);
+                    }
+                    else
+                    {
+                        Console.WriteLine(msg.Body.ToString());
+                        AllMsgs.Add(msg);
+                        foreach (Client_Queue client in Client_Queues.Values)
                         {
-                            if (!first)
-                            {
-                                builder.Append("\n");
-                            }
-                            else
-                            {
-                                first = false;
-                            }
-                            msg.Formatter = new BinaryMessageFormatter();
-                            builder.Append(msg.Body.ToString());
+                            client.sendMsg(msg);
                         }
-
-                        Console.Clear();
-                        Console.WriteLine("Chat inicializado");
-                        Console.WriteLine(builder.ToString());
                     }
 
                 }
             };
 
             Task receiveMsgs = Task.Factory.StartNew(receiveMsgsAction, "receiver");
-            /*
-            input = Console.ReadLine();
+
+            
             while (!input.Equals("parar"))
             {
-
-                Send(input, appQueue, username);
-
                 input = Console.ReadLine();
             }
-            */
+            
             Console.ReadKey();
         }
 
-        static string Receive(MessageQueue appQueue)
-        {
-            Message[] msgs = appQueue.GetAllMessages();
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
-
-            foreach (Message msg in msgs)
-            {
-                if (!first)
-                {
-                    builder.Append("\n");
-                }
-                else
-                {
-                    first = false;
-                }
-                msg.Formatter = new BinaryMessageFormatter();
-                builder.Append(msg.Body.ToString());
-            }
-
-            return builder.ToString();
-        }
         static void Send(string MessageToBeSent, MessageQueue appQueue, string username)
         {
             Message msg = new System.Messaging.Message();
