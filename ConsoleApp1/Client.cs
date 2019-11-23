@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Messaging;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,15 +14,26 @@ namespace Client
     {
 
         static MessageQueue MyQueue;
+        static MessageQueue ServerQueue;
+        static string localIP;
 
         static void Main(string[] args)
         {
 
             Console.WriteLine("Digite o ip do servidor:");
-            string server_ip = Console.ReadLine();
-            Console.WriteLine("Trying to connect to " + server_ip);
+            string serverIP = Console.ReadLine();
+            Console.WriteLine("Trying to connect to " + serverIP);
 
-            MessageQueue appQueue = new MessageQueue(String.Format(@"FormatName:DIRECT=TCP:{0}\Private$\MSMQ_queue", server_ip)); // 192.168.7.1  192.168.0.10
+            ServerQueue = new MessageQueue(String.Format(@"FormatName:DIRECT=TCP:{0}\Private$\MSMQ_queue", serverIP)); // 192.168.7.1  192.168.0.10
+
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                localIP = endPoint.Address.ToString();
+            }
+
+            Send(String.Format("Add:{0}",localIP));
 
             if (MessageQueue.Exists(@".\Private$\MSMQ_queue"))
             {
@@ -54,10 +67,12 @@ namespace Client
             while (!input.Equals("sair"))
             {
 
-                Send(input,appQueue,username);
+                Send(String.Format("{0}:{1}", username, input));
 
                 input = Console.ReadLine();
             }
+
+            Send(String.Format("Remove:{0}", localIP));
 
             Console.WriteLine("Conversa encerrada");
             Console.ReadKey();
@@ -110,15 +125,15 @@ namespace Client
 
             return builder.ToString();
         }
-        static void Send(string MessageToBeSent, MessageQueue appQueue, string username)
+        static void Send(string MessageToBeSent)
         {
             Message msg = new System.Messaging.Message();
 
             msg.Formatter = new BinaryMessageFormatter();
             msg.Body = MessageToBeSent;
-            msg.Label = username;
+            msg.Label = localIP;
 
-            if (MessageToBeSent.StartsWith("HP:"))
+            if (MessageToBeSent.StartsWith("(HP)"))
             {
                 msg.Priority = MessagePriority.Highest;
             }
@@ -127,7 +142,7 @@ namespace Client
                 msg.Priority = MessagePriority.Normal;
             }
 
-            appQueue.Send(msg);
+            ServerQueue.Send(msg);
         }
 
     }

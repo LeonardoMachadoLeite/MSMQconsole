@@ -50,13 +50,22 @@ namespace MSMQconsole
                     }
                     else
                     {
-                        Console.WriteLine(msg.Body.ToString());
-                        AllMsgs.Add(msg);
-                        foreach (Client_Queue client in Client_Queues.Values)
+                        if (msg.Body.ToString().StartsWith("Remove:"))
                         {
-                            client.sendMsg(msg);
+                            string remove_ip = msg.Body.ToString().Substring(4);
+                            Client_Queues.Remove(remove_ip);
+                        }
+                        else
+                        {
+                            Console.WriteLine(msg.Body.ToString());
+                            AllMsgs.Add(msg);
+                            foreach (Client_Queue client in Client_Queues.Values)
+                            {
+                                client.sendMsg(msg);
+                            }
                         }
                     }
+
 
                 }
             };
