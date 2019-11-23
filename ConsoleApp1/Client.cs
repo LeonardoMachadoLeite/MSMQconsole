@@ -26,12 +26,7 @@ namespace Client
 
             ServerQueue = new MessageQueue(String.Format(@"FormatName:DIRECT=TCP:{0}\Private$\MSMQ_queue", serverIP)); // 192.168.7.1  192.168.0.10
 
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
-            {
-                socket.Connect("8.8.8.8", 65530);
-                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-                localIP = endPoint.Address.ToString();
-            }
+            localIP = Dns.GetHostName();
 
             Send(String.Format("Add:{0}",localIP));
 

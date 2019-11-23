@@ -4,4 +4,3 @@ C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\bin\Debug\MSMQconsole.pdb
 C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\Server.csproj.CoreCompileInputs.cache
 C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.exe
 C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\MSMQconsole.pdb
-C:\Users\leoml\source\repos\MSMQconsole\MSMQconsole\obj\Debug\Server.csprojAssemblyReference.cache
